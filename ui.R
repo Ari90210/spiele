@@ -3,9 +3,10 @@ source("def.R")
 ui <- fluidPage(
   
 #### Spiele auswerten ####
-# Übersicht
+# Übersicht Spiele aus Gesamttabelle mit gespielten und bewerteten Spielen
   tabsetPanel(
     tabPanel("Spiele auswerten",
+             # Style für die Seite definieren:
            fluidRow(tags$style(HTML("
                                     .multicol { 
                                     height: 200px;
@@ -16,6 +17,7 @@ ui <- fluidPage(
                                     -column-fill: auto;
                                     }
                                     div.checkbox {margin-top: 0px;}")),
+                    # Datum begrenzen oder nur bestimmte Kategorien filtern
                     column(3,dateRangeInput(inputId = "dateaus",label="Datumsauswahl zuletzt gespielt",
                                             start="2007-09-01",end=Sys.Date(),language = "de", separator = " bis "),
                            checkboxInput("katwahl","Kategorien filtern"),
@@ -24,12 +26,16 @@ ui <- fluidPage(
                              selectInput("kat", "Kategorien aussuchen:",choices=kategorien,multiple=TRUE)
                            )
                     ),
-#                    column(1,checkboxInput("katwahl","Kategorien filtern")),  
+                    # Variablen wählen, die angezeigt werden sollen:
                     column(5,tags$div(align = 'left', 
                                       class = 'multicol', checkboxGroupInput("vars","Variablen anzeigen:",choices=vars,selected=vars[1:3])))),
+           # Button für Auswertung, daran Tabellenoutput anknüpfen:
            fluidRow(actionButton(inputId="auswert",label="Spiele auswerten"),
                     dataTableOutput("tabagg"))
            ),
+    
+### Gespielte Spiele eintragen ####
+# Name: wer trägt ein, Datum: wann gespielt, Spiel: aus Liste wählen, Spieler auswählen, Gewinner darauf basierend eintragen
     tabPanel("Gespielte Spiele",
       fluidRow(
        column(3,selectInput("nameg","Name",choices=spieler)),
@@ -40,9 +46,13 @@ ui <- fluidPage(
        column(3,checkboxGroupInput("spieler","Spieler",choices=c(spieler,"Andere"),selected=spieler)),
        column(5,uiOutput("winnerg"))
       ),
+      # Button für Eintragung, darunter Tabelle anzeigen mit allen bisher eingetragenen Spielen
       actionButton(inputId="eintragen",label="Speichern"),
       dataTableOutput("tabg")
   ),
+
+### Spiele bewerten ####
+# Name: Wer bewertet, Bewertung (1-10), Spiel aus Liste wählen
   tabPanel("Spiele bewerten",
 #      tags$img(height=50,src="spiele.jpg"),
       selectInput("nameb","Name",choices=spieler),
@@ -52,11 +62,15 @@ ui <- fluidPage(
       actionButton(inputId="bewerten",label="Bewerten"),
       dataTableOutput("tab")
     ),
+
+### Daten herunterladen ####
     tabPanel("Download",
      selectInput("dataset", "Datensatz Auswahl:", choices = c("Bewertete Spiele" = "Spieleb", "Gespielte Spiele" = "Spieleg", "Spiele Metadaten" = "bgg")),  
      downloadButton("downloadData", "Download"),
      dataTableOutput("tabout")
     ),
+
+### Daten hochladen ####
   tabPanel("Upload",
      fileInput("neudat", "Datensatz hochladen:",accept = c("text/csv","text/comma-separated-values,text/plain",".csv")),
      checkboxInput("trenn", "Trennzeichen verwenden"),
@@ -69,11 +83,12 @@ ui <- fluidPage(
      actionButton("neu", "Daten ersetzen"),
      textOutput("done")
   ),
+
+### Eintragung bei gespielten Spielen oder Bewertung korrigieren ####
+# Datensatz bestimmen, Name: wessen Eintrag
 tabPanel("Korrekturen",
          selectInput("datwahlk", "Welcher Datensatz:", choices = c("Gespielte Spiele" = "Spieleg", "Bewertete Spiele" = "Spieleb")),  
          selectInput("namek","Name",choices=spieler),
-#         dateRangeInput(inputId = "datek",label="Datumsauswahl wann eingetragen",
-#                        start="2017-09-01",end=Sys.Date(),language = "de", separator = " bis "),
          DT::dataTableOutput('datkorr'),
          actionButton("korr", "markierte Zeilen entfernen"),
          textOutput("donek")

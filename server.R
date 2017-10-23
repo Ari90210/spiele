@@ -1,24 +1,7 @@
 #setwd("H:/R-Files/Shiny/Spiele/")
 
 server <- function(input, output) {
-  datoutb <- eventReactive(input$bewerten, {
-    dat <- loadData("Spieleb.csv")
-    dati <- data.frame(Timestamp=as.character(Sys.time()),Spiel=input$spielb,Name=input$nameb,Bewertung=input$bewert)
-    datoutb <- rbind(dati,dat)
-    datoutb
-  })
-  datoutg <- eventReactive(input$eintragen, {
-    dat <- loadData("Spieleg.csv")
-    dati <- data.frame(TimestampEintrag=as.character(Sys.time()),Spiel=input$spielg,Name=input$nameg,Datum=as.character(input$date),Gewinner=input$winner,Spieler=paste(input$spieler,collapse=", "))
-    datoutg <- rbind(dati,dat)
-    datoutg
-  })
-  observeEvent(input$eintragen,{
-    saveData(datoutg(),"Spieleg.csv")
-  })
-  observeEvent(input$bewerten,{
-    saveData(datoutb(),"Spieleb.csv")
-  })
+### Datensatz für Auswertung erstellen ####
   datagg <- eventReactive(input$auswert, {
     datb <- loadData("Spieleb.csv")
     datg <- loadData("Spieleg.csv")
@@ -31,7 +14,7 @@ server <- function(input, output) {
     dataggg <- datg[, list(AnzahlGespielt=.N,
                            ZuerstGespielt = as.character(min(as.Date(Datum))),
                            ZuletztGespielt=as.character(max(as.Date(Datum))),
-#                           MeistensGewonnen=max(Gewinner),
+                           #MeistensGewonnen=max(Gewinner),
                            GewinnerAri=sum(Gewinner=="Ari"),
                            GewinnerBasti=sum(Gewinner=="Basti"),
                            GewinnerFlo=sum(Gewinner=="Flo"),
@@ -50,6 +33,24 @@ server <- function(input, output) {
     }
     datred <- datagg[between(as.Date(ZuletztGespielt), input$dateaus[1], input$dateaus[2]) | is.na(ZuletztGespielt)]
     datred[,input$vars,with=FALSE]    
+  })
+  datoutb <- eventReactive(input$bewerten, {
+    dat <- loadData("Spieleb.csv")
+    dati <- data.frame(Timestamp=as.character(Sys.time()),Spiel=input$spielb,Name=input$nameb,Bewertung=input$bewert)
+    datoutb <- rbind(dati,dat)
+    datoutb
+  })
+  datoutg <- eventReactive(input$eintragen, {
+    dat <- loadData("Spieleg.csv")
+    dati <- data.frame(TimestampEintrag=as.character(Sys.time()),Spiel=input$spielg,Name=input$nameg,Datum=as.character(input$date),Gewinner=paste(input$winner, collapse = ","),Spieler=paste(input$spieler,collapse=", "))
+    datoutg <- rbind(dati,dat)
+    datoutg
+  })
+  observeEvent(input$eintragen,{
+    saveData(datoutg(),"Spieleg.csv")
+  })
+  observeEvent(input$bewerten,{
+    saveData(datoutb(),"Spieleb.csv")
   })
   datneu <- eventReactive((input$neu || input$dazu), {
     dat <- fread(input$neudat$datapath, colClasses="character", sep=input$sepneudat)
