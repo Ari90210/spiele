@@ -11,15 +11,27 @@ server <- function(input, output) {
     setkey(datb, Spiel)
     setkey(datg, Spiel)
     datb$Bewertung <- as.integer(datb$Bewertung)
+    for(i in spieler){
+      datg[,Gewinner2 := ifelse(Gewinner=="alle", Spieler, Gewinner)]
+      ind <- grep(i, datg$Gewinner2)
+      datg[,paste("Gewinner",i,sep=""):= 0]
+      datg[ind,paste("Gewinner",i,sep="")] <- 1
+    }
     dataggg <- datg[, list(AnzahlGespielt=.N,
                            ZuerstGespielt = as.character(min(as.Date(Datum))),
                            ZuletztGespielt=as.character(max(as.Date(Datum))),
                            #MeistensGewonnen=max(Gewinner),
-                           GewinnerAri=sum(Gewinner=="Ari"),
-                           GewinnerBasti=sum(Gewinner=="Basti"),
-                           GewinnerFlo=sum(Gewinner=="Flo"),
-                           GewinnerSabrina=sum(Gewinner=="Sabrina")),
+                           GewinnerAri=sum(GewinnerAri),
+                           GewinnerBasti=sum(GewinnerBasti),
+                           GewinnerFlo=sum(GewinnerFlo),
+                           GewinnerSabrina=sum(GewinnerSabrina)),
                     by = list(Spiel)]
+    dataggg[,maxGewinn := max(c(GewinnerAri,GewinnerFlo,GewinnerBasti,GewinnerSabrina)),by=Spiel]
+    dataggg[,MeistGewonnen := ""]
+    for(i in spieler){
+      ind <- ((dataggg[,paste("Gewinner",i,sep=""),with=FALSE]==dataggg[,maxGewinn])[,1] & dataggg[,maxGewinn] > 0)
+      dataggg[ind, MeistGewonnen := paste(dataggg[ind,MeistGewonnen],i,sep="")]
+    }
     dataggb <- datb[, list(Bewertung=round(mean(Bewertung),1),AnzahlBewert=length(unique(Name)),BewertungAri=Bewertung[Name=="Ari"],BewertungBasti=Bewertung[Name=="Basti"],BewertungFlo=Bewertung[Name=="Flo"],BewertungSabrina=Bewertung[Name=="Sabrina"]), by = list(Spiel)]
     datagg1 <- merge(dataggg,dataggb,all=TRUE)
     datagg <- merge(dats,datagg1)
@@ -101,12 +113,18 @@ server <- function(input, output) {
     datneu()})
   output$datkorr <- DT::renderDataTable({
     dat <- loadData(paste(input$datwahlk,".csv",sep=""))
-    datred <- dat[Name == input$namek]
+#    datred <- dat[Name == input$namek]
 #    datred <- dat[between(as.Date(Timestamp), input$datek[1], input$datek[2])]
-    datred})
+    dat})
   observeEvent(input$korr, {
     ind <- input$datkorr_rows_selected
     dat <- loadData(paste(input$datwahlk,".csv",sep=""))
+    dat2 <- dat[ind]
+    test <- try(loadData(paste(Sys.Date(),"Spieleg",".csv",sep="")))
+    if("try-error" %in% class(test)) {
+      dat2 <- rbind(dat2,test)
+    }
+    saveData(dat2, file=paste(Sys.Date(),input$datwahlk,".csv",sep=""))
     dat <- dat[-ind]
     saveData(dat, file=paste(input$datwahlk,".csv",sep=""))
   })

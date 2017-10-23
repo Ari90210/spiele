@@ -88,7 +88,7 @@ ui <- fluidPage(
 # Datensatz bestimmen, Name: wessen Eintrag
 tabPanel("Korrekturen",
          selectInput("datwahlk", "Welcher Datensatz:", choices = c("Gespielte Spiele" = "Spieleg", "Bewertete Spiele" = "Spieleb")),  
-         selectInput("namek","Name",choices=spieler),
+#         selectInput("namek","Name",choices=spieler),
          DT::dataTableOutput('datkorr'),
          actionButton("korr", "markierte Zeilen entfernen"),
          textOutput("donek")

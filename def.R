@@ -1,4 +1,4 @@
-## Definitionen und Packages für die App
+## Definitionen und Packages f?r die App
 #setwd("H:/R-Files/Shiny/Spiele/spieleapp")
 
 library(shiny)
@@ -26,6 +26,6 @@ loadData <- function(file,sep=",") {
 dats <- loadData("bgg.csv")
 setorder(dats, Spiel)
 spieler <- c("Ari", "Basti", "Flo", "Sabrina")
-vars <- c("Spiel","Bewertung","ZuletztGespielt","ZuerstGespielt","AnzahlGespielt","AnzahlBewert","Erscheinungsjahr","AnzSpielerMin","AnzSpielerMax","MinSpielzeit","MaxSpielzeit","AbAlter","Autor","Kategorien","Wem","BewertungAri","BewertungBasti","BewertungFlo","BewertungSabrina","GewinnerAri","GewinnerBasti","GewinnerFlo","GewinnerSabrina")
+vars <- c("Spiel","Bewertung","ZuletztGespielt","ZuerstGespielt","AnzahlGespielt","AnzahlBewert","Erscheinungsjahr","AnzSpielerMin","AnzSpielerMax","MinSpielzeit","MaxSpielzeit","AbAlter","Autor","Kategorien","Wem","BewertungAri","BewertungBasti","BewertungFlo","BewertungSabrina","GewinnerAri","GewinnerBasti","GewinnerFlo","GewinnerSabrina","MeistGewonnen")
 
 kategorien <- unique(strsplit(paste(unique(dats$Kategorien), collapse=","),",")[[1]])
