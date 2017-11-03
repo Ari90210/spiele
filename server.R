@@ -121,7 +121,7 @@ server <- function(input, output) {
     dat <- loadData(paste(input$datwahlk,".csv",sep=""))
     dat2 <- dat[ind]
     test <- try(loadData(paste(Sys.Date(),"Spieleg",".csv",sep="")))
-    if("try-error" %in% class(test)) {
+    if(!("try-error" %in% class(test))) {
       dat2 <- rbind(dat2,test)
     }
     saveData(dat2, file=paste(Sys.Date(),input$datwahlk,".csv",sep=""))
