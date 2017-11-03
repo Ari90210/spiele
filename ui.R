@@ -6,7 +6,8 @@ ui <- fluidPage(
 # Übersicht Spiele aus Gesamttabelle mit gespielten und bewerteten Spielen
   tabsetPanel(
     tabPanel("Spiele auswerten",
-             # Style für die Seite definieren:
+#          tags$img(height=100, src="IMG-20171011-WA0010.jpg"),
+           # Style für die Seite definieren:
            fluidRow(tags$style(HTML("
                                     .multicol { 
                                     height: 200px;
